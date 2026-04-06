@@ -41,6 +41,10 @@ const emit = defineEmits(['recalculate'])
         <dt>匹配专业条目</dt>
         <dd>{{ summary.matchedCount }} 项</dd>
       </div>
+      <div>
+        <dt>常规冲稳保</dt>
+        <dd>{{ summary.regularRecommendedCount }} 项</dd>
+      </div>
     </dl>
 
     <div class="rank-box">

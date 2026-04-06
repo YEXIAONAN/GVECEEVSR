@@ -1,7 +1,8 @@
 <script setup>
+import { computed } from 'vue'
 import RecommendationCard from './RecommendationCard.vue'
 
-defineProps({
+const props = defineProps({
   title: {
     type: String,
     required: true
@@ -17,8 +18,14 @@ defineProps({
   items: {
     type: Array,
     default: () => []
+  },
+  emptyText: {
+    type: String,
+    default: '当前分组暂无条目。'
   }
 })
+
+const schoolNames = computed(() => [...new Set(props.items.map((item) => item.school))])
 </script>
 
 <template>
@@ -28,8 +35,11 @@ defineProps({
       <span>{{ items.length }} 项</span>
     </div>
     <p class="desc">{{ description }}</p>
+    <p v-if="items.length > 0" class="school-coverage">
+      覆盖学校：{{ schoolNames.length }} 所（{{ schoolNames.join('、') }}）
+    </p>
 
-    <div v-if="items.length === 0" class="empty">当前分组暂无条目。</div>
+    <div v-if="items.length === 0" class="empty">{{ emptyText }}</div>
 
     <div v-else class="list">
       <RecommendationCard v-for="item in items" :key="item.id" :item="item" :group-type="groupType" />
@@ -67,6 +77,13 @@ h3 {
   color: var(--color-subtle);
   font-size: 0.8rem;
   line-height: 1.56;
+}
+
+.school-coverage {
+  margin: 6px 0 0;
+  color: var(--color-subtle);
+  font-size: 0.76rem;
+  line-height: 1.5;
 }
 
 .empty {

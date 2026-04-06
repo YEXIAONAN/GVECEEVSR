@@ -59,6 +59,48 @@ function buildCommonItem(record) {
   }
 }
 
+function createSchoolPool(records) {
+  const poolMap = new Map()
+  for (const record of records) {
+    if (!poolMap.has(record.school)) {
+      poolMap.set(record.school, {
+        school: record.school,
+        totalMajors: 0,
+        calculableMajors: 0,
+        referenceOnlyMajors: 0,
+        majors: []
+      })
+    }
+    const bucket = poolMap.get(record.school)
+    const hasScore = Number.isFinite(toNumberOrNull(record.lastYearMinScore))
+
+    bucket.totalMajors += 1
+    if (hasScore) bucket.calculableMajors += 1
+    if (!hasScore) bucket.referenceOnlyMajors += 1
+    bucket.majors.push({
+      id: record.id,
+      major: record.major,
+      lastYearMinScore: record.lastYearMinScore,
+      admissionPlan: record.admissionPlan,
+      scoreYear: record.scoreYear,
+      planYear: record.planYear,
+      dataStatus: record.dataStatus,
+      note: record.note
+    })
+  }
+
+  return [...poolMap.values()]
+    .map((item) => ({
+      ...item,
+      majors: [...item.majors].sort((a, b) => String(a.major).localeCompare(String(b.major), 'zh-CN'))
+    }))
+    .sort((a, b) => {
+      if (a.calculableMajors !== b.calculableMajors) return b.calculableMajors - a.calculableMajors
+      if (a.totalMajors !== b.totalMajors) return b.totalMajors - a.totalMajors
+      return String(a.school).localeCompare(String(b.school), 'zh-CN')
+    })
+}
+
 function classifyByGap(gap, thresholds) {
   if (gap < thresholds.rushMin) return 'highRisk'
   if (gap <= thresholds.rushMax) return 'rush'
@@ -122,9 +164,20 @@ export function recommendByScore({
     steadyList: [],
     safeList: [],
     referenceOnlyList: [],
+    schoolCoverageSummary: {
+      totalSchoolCount: 0,
+      totalMajorCount: 0,
+      calculableMajorCount: 0,
+      referenceOnlyMajorCount: 0,
+      matchedSchoolCount: 0,
+      schoolPool: []
+    },
     summary: {
       score: numericScore,
       matchedCount: 0,
+      regularRecommendedCount: 0,
+      hasRegularRecommendation: false,
+      fallbackMessage: '',
       riskDistribution: {
         rush: 0,
         steady: 0,
@@ -139,6 +192,19 @@ export function recommendByScore({
 
   const highRiskList = []
   const scopedRecords = admissions.filter((record) => isMatchRecord(record, filters))
+  const schoolPool = createSchoolPool(scopedRecords)
+  const calculableCount = scopedRecords.filter((record) =>
+    Number.isFinite(toNumberOrNull(record.lastYearMinScore))
+  ).length
+
+  result.schoolCoverageSummary = {
+    totalSchoolCount: new Set(scopedRecords.map((item) => item.school)).size,
+    totalMajorCount: scopedRecords.length,
+    calculableMajorCount: calculableCount,
+    referenceOnlyMajorCount: scopedRecords.length - calculableCount,
+    matchedSchoolCount: 0,
+    schoolPool
+  }
 
   if (numericScore === null) {
     const referenceOnly = scopedRecords.map((record) => ({
@@ -152,6 +218,12 @@ export function recommendByScore({
     result.referenceOnlyList = referenceOnly
     result.summary.matchedCount = referenceOnly.length
     result.summary.riskDistribution.referenceOnly = referenceOnly.length
+    result.summary.fallbackMessage = '未输入有效分数时，仅展示院校与专业池及公开计划信息。'
+    result.summary.hasRegularRecommendation = false
+    result.summary.regularRecommendedCount = 0
+    result.schoolCoverageSummary.matchedSchoolCount = new Set(
+      referenceOnly.map((item) => item.school)
+    ).size
     return result
   }
 
@@ -203,11 +275,35 @@ export function recommendByScore({
   result.summary.riskDistribution.safe = result.safeList.length
   result.summary.riskDistribution.referenceOnly = result.referenceOnlyList.length
   result.summary.riskDistribution.hiddenHighRisk = highRiskList.length
+  result.summary.regularRecommendedCount =
+    result.rushList.length + result.steadyList.length + result.safeList.length
+  result.summary.hasRegularRecommendation = result.summary.regularRecommendedCount > 0
   result.summary.matchedCount =
     result.rushList.length +
     result.steadyList.length +
     result.safeList.length +
     result.referenceOnlyList.length
+  result.schoolCoverageSummary.matchedSchoolCount = new Set(
+    [
+      ...result.rushList.map((item) => item.school),
+      ...result.steadyList.map((item) => item.school),
+      ...result.safeList.map((item) => item.school),
+      ...result.referenceOnlyList.map((item) => item.school)
+    ].filter(Boolean)
+  ).size
+
+  if (!result.summary.hasRegularRecommendation) {
+    if (result.schoolCoverageSummary.calculableMajorCount === 0) {
+      result.summary.fallbackMessage =
+        '当前命中院校已有专业池，但多数专业暂无公开最低分，暂无法形成常规冲稳保推荐。请先参考“仅计划参考”和“学校概览”模块。'
+    } else if (highRiskList.length > 0) {
+      result.summary.fallbackMessage =
+        '当前分数低于已公开最低分区间，常规冲稳保暂为空。建议优先查看学校概览与仅计划参考项，保守填报。'
+    } else {
+      result.summary.fallbackMessage =
+        '当前条件下常规冲稳保项较少，请结合学校概览与官方最新公告综合判断。'
+    }
+  }
 
   if (includeHighRisk) {
     result.highRiskList = highRiskList.map((item) => ({

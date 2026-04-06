@@ -2,6 +2,8 @@
 import { computed, nextTick, ref } from 'vue'
 import ScoreForm from '../components/ScoreForm.vue'
 import ResultSummary from '../components/ResultSummary.vue'
+import SchoolCoverageOverview from '../components/SchoolCoverageOverview.vue'
+import SchoolPool from '../components/SchoolPool.vue'
 import RecommendationGroup from '../components/RecommendationGroup.vue'
 import DisclaimerBox from '../components/DisclaimerBox.vue'
 import { ADMISSIONS } from '../data/admissions.js'
@@ -21,6 +23,14 @@ const currentCategory = computed(() => MAJOR_CATEGORIES.find((item) => item.code
 const modeLabelMap = computed(() =>
   Object.fromEntries(ADMISSION_MODES.map((item) => [item.code, item.name]))
 )
+
+const regularGroupEmptyText = computed(() => {
+  if (!recommendResult.value) return '当前分组暂无条目。'
+  if (!recommendResult.value.summary.hasRegularRecommendation) {
+    return '当前分数下暂无常规冲稳保条目，建议先查看“学校概览”和“仅计划参考”。'
+  }
+  return '当前分组暂无条目。'
+})
 
 function runSimulation(payload) {
   const score = Number(payload.score)
@@ -90,30 +100,39 @@ function resetSimulation() {
         :admission-mode-label="modeLabelMap[runQuery.admissionMode] || '对口技能类录取方式'"
         @recalculate="resetSimulation"
       />
+      <SchoolCoverageOverview
+        :coverage="recommendResult.schoolCoverageSummary"
+        :summary="recommendResult.summary"
+      />
+      <SchoolPool :school-pool="recommendResult.schoolCoverageSummary.schoolPool" />
 
       <RecommendationGroup
         title="冲档建议"
         description="分差 0-8，波动风险较大，建议少量填报。"
         group-type="rush"
         :items="recommendResult.rushList"
+        :empty-text="regularGroupEmptyText"
       />
       <RecommendationGroup
         title="稳妥建议"
         description="分差 9-20，竞争力相对更均衡，仍需关注当年热度变化。"
         group-type="steady"
         :items="recommendResult.steadyList"
+        :empty-text="regularGroupEmptyText"
       />
       <RecommendationGroup
         title="保底建议"
         description="分差大于 20，偏保守参考，不代表确定录取。"
         group-type="safe"
         :items="recommendResult.safeList"
+        :empty-text="regularGroupEmptyText"
       />
       <RecommendationGroup
         title="仅计划参考"
-        description="暂无公开最低分，不能参与常规分差判断。"
+        description="这些专业已确认开设或有计划信息，但暂无公开最低分，不参与常规分差判断。"
         group-type="referenceOnly"
         :items="recommendResult.referenceOnlyList"
+        empty-text="当前暂无仅计划参考项。"
       />
     </section>
 

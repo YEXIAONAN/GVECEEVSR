@@ -1,5 +1,5 @@
 <script setup>
-const props = defineProps({
+defineProps({
   item: {
     type: Object,
     required: true
@@ -67,9 +67,16 @@ function sourceText(source) {
 
     <p class="reason">{{ item.recommendReason }}</p>
     <p v-if="groupType === 'referenceOnly'" class="reference-hint">暂无公开最低分，仅可作计划参考。</p>
+    <p v-if="item.note" class="source">{{ item.note }}</p>
 
     <p class="source">最低分来源：{{ sourceText(item.scoreSource) }}</p>
+    <p v-if="item.scoreSource?.url" class="source-link">
+      <a :href="item.scoreSource.url" target="_blank" rel="noopener noreferrer">查看最低分来源页面</a>
+    </p>
     <p class="source">计划来源：{{ sourceText(item.planSource) }}</p>
+    <p v-if="item.planSource?.url" class="source-link">
+      <a :href="item.planSource.url" target="_blank" rel="noopener noreferrer">查看计划来源页面</a>
+    </p>
   </article>
 </template>
 
@@ -149,6 +156,15 @@ dd {
 
 .reference-hint {
   color: #7d3a2d;
+}
+
+.source-link {
+  margin: 5px 0 0;
+  font-size: 0.78rem;
+}
+
+.source-link a {
+  color: var(--color-primary);
 }
 
 .card-rush {

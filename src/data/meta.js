@@ -7,7 +7,7 @@
 
 export const PROJECT_META = {
   projectName: '广西职教高考志愿模拟推荐',
-  dataVersion: '2026.04.06-static',
+  dataVersion: '2026.04.06-r2',
   lastUpdated: '2026-04-06',
   maintainer: 'Waiting',
   disclaimer:
@@ -40,12 +40,20 @@ export const DATA_STATUS_ENUM = {
 
 export const YEAR_NOTES = [
   {
-    scoreYear: 2025,
-    note: '用于 2026 年志愿模拟时的“去年最低分参考年”。'
+    scoreYear: 2024,
+    note: '当前已补充的主要最低分参考年。'
   },
   {
-    planYear: 2026,
-    note: '用于 2026 年志愿模拟时的“当年计划参考年”。'
+    scoreYear: 2025,
+    note: '部分院校提供了 2025 年对口录取最低分。'
+  },
+  {
+    planYear: 2025,
+    note: '部分院校已补充到 2025 年对口招生计划。'
+  },
+  {
+    planYear: 2022,
+    note: '历史公开对口计划用于补充院校覆盖，不代表当年即时计划。'
   }
 ]
 
