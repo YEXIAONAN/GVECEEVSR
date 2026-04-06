@@ -26,17 +26,21 @@ const props = defineProps({
 })
 
 const schoolNames = computed(() => [...new Set(props.items.map((item) => item.school))])
+const schoolCoverageText = computed(() => {
+  if (schoolNames.value.length <= 4) return schoolNames.value.join('、')
+  return `${schoolNames.value.slice(0, 4).join('、')} 等`
+})
 </script>
 
 <template>
   <section :class="['group', `group-${groupType}`]">
     <div class="group-head">
       <h3>{{ title }}</h3>
-      <span>{{ items.length }} 项</span>
+      <span class="count">{{ items.length }} 项</span>
     </div>
     <p class="desc">{{ description }}</p>
     <p v-if="items.length > 0" class="school-coverage">
-      覆盖学校：{{ schoolNames.length }} 所（{{ schoolNames.join('、') }}）
+      覆盖学校：{{ schoolNames.length }} 所（{{ schoolCoverageText }}）
     </p>
 
     <div v-if="items.length === 0" class="empty">{{ emptyText }}</div>
@@ -49,11 +53,10 @@ const schoolNames = computed(() => [...new Set(props.items.map((item) => item.sc
 
 <style scoped>
 .group {
-  border: 1px solid var(--color-line-strong);
+  border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 14px;
   background: var(--color-surface);
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
 }
 
 .group-head {
@@ -64,12 +67,21 @@ const schoolNames = computed(() => [...new Set(props.items.map((item) => item.sc
 
 h3 {
   margin: 0;
-  font-size: 0.97rem;
+  font-size: 1rem;
 }
 
-.group-head span {
-  font-size: 0.75rem;
-  color: var(--color-subtle);
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 0.76rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-line);
+  color: var(--color-subtle-strong);
+  background: var(--color-surface-soft);
 }
 
 .desc {
@@ -87,34 +99,40 @@ h3 {
 }
 
 .empty {
-  margin-top: 10px;
+  margin-top: 12px;
   border: 1px dashed var(--color-line);
-  border-radius: 9px;
-  padding: 10px;
+  border-radius: 10px;
+  padding: 12px;
   font-size: 0.82rem;
   color: var(--color-subtle);
   background: var(--color-surface-soft);
 }
 
 .list {
-  margin-top: 11px;
+  margin-top: 12px;
   display: grid;
   gap: 10px;
 }
 
 .group-rush {
-  border-left: 4px solid var(--color-rush-line);
+  border-top: 4px solid var(--color-rush-line);
 }
 
 .group-steady {
-  border-left: 4px solid var(--color-steady-line);
+  border-top: 4px solid var(--color-steady-line);
 }
 
 .group-safe {
-  border-left: 4px solid var(--color-safe-line);
+  border-top: 4px solid var(--color-safe-line);
 }
 
 .group-referenceOnly {
-  border-left: 4px solid var(--color-ref-line);
+  border-top: 4px solid var(--color-ref-line);
+}
+
+@media (min-width: 1200px) {
+  .list {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 </style>

@@ -43,37 +43,36 @@ defineProps({
 
 <style scoped>
 .coverage {
-  border: 1px solid var(--color-line-strong);
+  border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 14px;
   background: var(--color-surface);
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
 }
 
 h2 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 1.02rem;
 }
 
 .intro {
-  margin: 6px 0 0;
-  font-size: 0.8rem;
-  line-height: 1.56;
+  margin: 7px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
   color: var(--color-subtle);
 }
 
 .stats {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
 }
 
 .stats div {
   border: 1px solid var(--color-line);
-  border-radius: 8px;
+  border-radius: 10px;
   background: var(--color-surface-soft);
-  padding: 8px 9px;
+  padding: 10px;
 }
 
 dt {
@@ -82,19 +81,26 @@ dt {
 }
 
 dd {
-  margin: 4px 0 0;
-  font-size: 0.9rem;
+  margin: 5px 0 0;
+  font-size: 1.02rem;
+  font-weight: 600;
   color: var(--color-text);
 }
 
 .fallback {
-  margin: 10px 0 0;
+  margin: 11px 0 0;
   border: 1px solid #e7d7be;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #fef8ef;
   color: #7a4b23;
   font-size: 0.8rem;
   line-height: 1.56;
-  padding: 8px 9px;
+  padding: 9px 10px;
+}
+
+@media (min-width: 900px) {
+  .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 </style>

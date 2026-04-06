@@ -14,24 +14,25 @@ const currentYear = new Date().getFullYear()
 <style scoped>
 .app-footer {
   border-top: 1px solid var(--color-line-strong);
-  background: var(--color-surface);
+  background: #f0f3f7;
 }
 
 .app-footer__inner {
-  width: min(100%, 760px);
+  width: min(100%, var(--layout-max-width));
   margin: 0 auto;
-  padding: 11px 12px 12px;
+  padding: 13px var(--layout-side-gap) 14px;
 }
 
 p {
   margin: 0;
-  font-size: 0.73rem;
+  font-size: 0.76rem;
   color: var(--color-subtle);
   line-height: 1.58;
 }
 
 .author {
-  margin-top: 4px;
+  margin-top: 5px;
+  color: var(--color-subtle-strong);
   letter-spacing: 0.02em;
 }
 </style>

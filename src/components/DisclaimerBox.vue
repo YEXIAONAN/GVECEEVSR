@@ -12,25 +12,25 @@
 
 <style scoped>
 .disclaimer-box {
-  border: 1px solid var(--color-line-strong);
+  border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 14px;
   background: var(--color-surface-soft);
 }
 
 h3 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1rem;
   color: var(--color-text);
 }
 
 ul {
-  margin: 9px 0 0;
+  margin: 10px 0 0;
   padding-left: 16px;
 }
 
 li {
-  font-size: 0.83rem;
+  font-size: 0.84rem;
   color: var(--color-subtle);
   line-height: 1.62;
 }

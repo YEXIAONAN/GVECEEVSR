@@ -16,7 +16,7 @@ const recommendResult = ref(null)
 const rankResult = ref(null)
 const resultSection = ref(null)
 const disclaimerSection = ref(null)
-const formSection = ref(null)
+const workspaceSection = ref(null)
 
 const currentCategory = computed(() => MAJOR_CATEGORIES.find((item) => item.code === 'electronic_information'))
 
@@ -58,7 +58,10 @@ function runSimulation(payload) {
   })
 
   nextTick(() => {
-    resultSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const isDesktop = window.matchMedia('(min-width: 1024px)').matches
+    if (!isDesktop) {
+      resultSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   })
 }
 
@@ -70,73 +73,104 @@ function resetSimulation() {
   runQuery.value = null
   recommendResult.value = null
   rankResult.value = null
-  formSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  workspaceSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 </script>
 
 <template>
   <div class="home-page">
-    <section class="hero panel">
-      <h1>广西职教高考志愿模拟推荐</h1>
-      <p>面向广西职教高考考生的志愿辅助模拟工具，当前版本聚焦电子信息大类与对口技能类录取方式。</p>
-      <p class="powered">Powered By Waiting</p>
+    <section class="hero">
+      <div class="hero-main panel">
+        <h1>广西职教高考志愿模拟推荐</h1>
+        <p class="hero-intro">
+          面向广西职教高考考生的静态志愿辅助工具。当前版本聚焦
+          {{ currentCategory?.name || '电子信息大类' }} 与对口技能类录取方式。
+        </p>
+        <div class="hero-actions">
+          <button type="button" class="hero-link" @click="jumpToDisclaimer">查看免责声明与数据口径</button>
+          <span class="hero-note">推荐仅供模拟参考，最终以官方公布为准。</span>
+        </div>
+      </div>
+      <aside class="hero-side panel">
+        <h2>使用说明</h2>
+        <ul>
+          <li>按“学校 + 专业”粒度推荐，同校可出现多个专业。</li>
+          <li>优先展示有公开最低分的数据，缺失数据会明确标注。</li>
+          <li>区位次仅作低可信宽区间估算，不代表官方一分一档。</li>
+        </ul>
+      </aside>
     </section>
 
-    <section ref="formSection" class="panel">
-      <ScoreForm
-        :admission-modes="ADMISSION_MODES"
-        :default-admission-mode="ADMISSION_MODES[0]?.code || 'counterpart_skills'"
-        :major-category-name="currentCategory?.name || '电子信息大类'"
-        @submit="runSimulation"
-        @open-disclaimer="jumpToDisclaimer"
-      />
+    <section ref="workspaceSection" class="workspace">
+      <aside class="left-pane">
+        <div class="left-sticky">
+          <ScoreForm
+            :admission-modes="ADMISSION_MODES"
+            :default-admission-mode="ADMISSION_MODES[0]?.code || 'counterpart_skills'"
+            :major-category-name="currentCategory?.name || '电子信息大类'"
+            :has-result="Boolean(runQuery && recommendResult && rankResult)"
+            @submit="runSimulation"
+            @reset="resetSimulation"
+            @open-disclaimer="jumpToDisclaimer"
+          />
+
+          <ResultSummary
+            v-if="runQuery && recommendResult && rankResult"
+            :query="runQuery"
+            :rank-estimate="rankResult"
+            :summary="recommendResult.summary"
+            :admission-mode-label="modeLabelMap[runQuery.admissionMode] || '对口技能类录取方式'"
+          />
+        </div>
+      </aside>
+
+      <section ref="resultSection" class="right-pane">
+        <template v-if="runQuery && recommendResult && rankResult">
+          <SchoolCoverageOverview
+            :coverage="recommendResult.schoolCoverageSummary"
+            :summary="recommendResult.summary"
+          />
+
+          <RecommendationGroup
+            title="冲档建议"
+            description="分差 0-8，波动风险较大，建议少量填报。"
+            group-type="rush"
+            :items="recommendResult.rushList"
+            :empty-text="regularGroupEmptyText"
+          />
+          <RecommendationGroup
+            title="稳妥建议"
+            description="分差 9-20，竞争力相对更均衡，仍需关注当年热度变化。"
+            group-type="steady"
+            :items="recommendResult.steadyList"
+            :empty-text="regularGroupEmptyText"
+          />
+          <RecommendationGroup
+            title="保底建议"
+            description="分差大于 20，偏保守参考，不代表确定录取。"
+            group-type="safe"
+            :items="recommendResult.safeList"
+            :empty-text="regularGroupEmptyText"
+          />
+          <RecommendationGroup
+            title="仅计划参考"
+            description="这些专业已确认开设或有计划信息，但暂无公开最低分，不参与常规分差判断。"
+            group-type="referenceOnly"
+            :items="recommendResult.referenceOnlyList"
+            empty-text="当前暂无仅计划参考项。"
+          />
+
+          <SchoolPool :school-pool="recommendResult.schoolCoverageSummary.schoolPool" />
+        </template>
+        <section v-else class="result-empty panel">
+          <h2>等待测算</h2>
+          <p>输入分数并点击“开始测算”后，右侧将展示院校覆盖概览、冲稳保分组和学校概览。</p>
+          <p>当前工具范围：{{ currentCategory?.name || '电子信息大类' }} · 对口技能类录取方式。</p>
+        </section>
+      </section>
     </section>
 
-    <section v-if="runQuery && recommendResult && rankResult" ref="resultSection" class="result-area">
-      <ResultSummary
-        :query="runQuery"
-        :rank-estimate="rankResult"
-        :summary="recommendResult.summary"
-        :admission-mode-label="modeLabelMap[runQuery.admissionMode] || '对口技能类录取方式'"
-        @recalculate="resetSimulation"
-      />
-      <SchoolCoverageOverview
-        :coverage="recommendResult.schoolCoverageSummary"
-        :summary="recommendResult.summary"
-      />
-      <SchoolPool :school-pool="recommendResult.schoolCoverageSummary.schoolPool" />
-
-      <RecommendationGroup
-        title="冲档建议"
-        description="分差 0-8，波动风险较大，建议少量填报。"
-        group-type="rush"
-        :items="recommendResult.rushList"
-        :empty-text="regularGroupEmptyText"
-      />
-      <RecommendationGroup
-        title="稳妥建议"
-        description="分差 9-20，竞争力相对更均衡，仍需关注当年热度变化。"
-        group-type="steady"
-        :items="recommendResult.steadyList"
-        :empty-text="regularGroupEmptyText"
-      />
-      <RecommendationGroup
-        title="保底建议"
-        description="分差大于 20，偏保守参考，不代表确定录取。"
-        group-type="safe"
-        :items="recommendResult.safeList"
-        :empty-text="regularGroupEmptyText"
-      />
-      <RecommendationGroup
-        title="仅计划参考"
-        description="这些专业已确认开设或有计划信息，但暂无公开最低分，不参与常规分差判断。"
-        group-type="referenceOnly"
-        :items="recommendResult.referenceOnlyList"
-        empty-text="当前暂无仅计划参考项。"
-      />
-    </section>
-
-    <section ref="disclaimerSection" class="panel">
+    <section ref="disclaimerSection" class="panel panel-disclaimer">
       <DisclaimerBox />
     </section>
   </div>
@@ -145,45 +179,134 @@ function resetSimulation() {
 <style scoped>
 .home-page {
   display: grid;
-  gap: 13px;
+  gap: 16px;
 }
 
 .panel {
   background: var(--color-surface);
   border: 1px solid var(--color-line-strong);
   border-radius: var(--radius-lg);
-  padding: 12px;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
+  padding: 14px;
 }
 
-.hero h1 {
-  margin: 0;
-  font-size: 1.15rem;
-  line-height: 1.4;
-  letter-spacing: 0.01em;
-}
-
-.hero p {
-  margin: 7px 0 0;
-  color: var(--color-subtle);
-  font-size: 0.85rem;
-  line-height: 1.62;
-}
-
-.powered {
-  display: inline-flex;
-  margin-top: 10px;
-  padding: 4px 10px 5px;
-  border-radius: 999px;
-  border: 1px solid var(--color-line);
-  background: var(--color-surface-soft);
-  font-size: 0.73rem;
-  color: var(--color-subtle);
-  letter-spacing: 0.03em;
-}
-
-.result-area {
+.hero {
   display: grid;
-  gap: 13px;
+  gap: 12px;
+}
+
+.hero-main {
+  display: grid;
+  gap: 10px;
+}
+
+.hero-main h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.01em;
+  line-height: 1.32;
+}
+
+.hero-intro {
+  margin: 0;
+  color: var(--color-subtle);
+  font-size: 0.9rem;
+}
+
+.hero-actions {
+  display: grid;
+  gap: 6px;
+  align-items: center;
+}
+
+.hero-link {
+  width: fit-content;
+  border: 1px solid var(--color-line);
+  background: #fff;
+  color: var(--color-primary);
+  border-radius: 8px;
+  height: 34px;
+  padding: 0 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.hero-note {
+  color: var(--color-subtle);
+  font-size: 0.79rem;
+}
+
+.hero-side h2 {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.hero-side ul {
+  margin: 8px 0 0;
+  padding-left: 16px;
+}
+
+.hero-side li {
+  color: var(--color-subtle);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.workspace {
+  display: grid;
+  gap: 14px;
+}
+
+.left-pane {
+  min-width: 0;
+}
+
+.left-sticky {
+  display: grid;
+  gap: 12px;
+}
+
+.right-pane {
+  min-width: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.result-empty h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.result-empty p {
+  margin: 8px 0 0;
+  color: var(--color-subtle);
+  font-size: 0.86rem;
+}
+
+.panel-disclaimer {
+  background: var(--color-surface-soft);
+}
+
+@media (min-width: 900px) {
+  .hero {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: stretch;
+  }
+}
+
+@media (min-width: 1024px) {
+  .workspace {
+    grid-template-columns: minmax(360px, 4fr) minmax(0, 8fr);
+    align-items: start;
+    gap: 16px;
+  }
+
+  .left-sticky {
+    position: sticky;
+    top: 86px;
+  }
+
+  .hero-main h1 {
+    font-size: 1.58rem;
+  }
 }
 </style>

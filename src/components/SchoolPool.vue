@@ -51,21 +51,20 @@ defineProps({
 
 <style scoped>
 .school-pool {
-  border: 1px solid var(--color-line-strong);
+  border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 14px;
   background: var(--color-surface);
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.03);
 }
 
 .head h2 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 1.02rem;
 }
 
 .head p {
-  margin: 6px 0 0;
-  font-size: 0.8rem;
+  margin: 7px 0 0;
+  font-size: 0.82rem;
   color: var(--color-subtle);
 }
 
@@ -80,14 +79,14 @@ defineProps({
 }
 
 .list {
-  margin-top: 10px;
+  margin-top: 12px;
   display: grid;
-  gap: 8px;
+  gap: 10px;
 }
 
 .school-item {
   border: 1px solid var(--color-line);
-  border-radius: 8px;
+  border-radius: 10px;
   background: #fff;
   overflow: hidden;
 }
@@ -95,9 +94,11 @@ defineProps({
 summary {
   list-style: none;
   cursor: pointer;
-  padding: 10px;
-  display: grid;
-  gap: 4px;
+  padding: 11px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 summary::-webkit-details-marker {
@@ -105,19 +106,20 @@ summary::-webkit-details-marker {
 }
 
 .name {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--color-text);
   font-weight: 600;
 }
 
 .meta {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   color: var(--color-subtle);
+  text-align: right;
 }
 
 .major-list {
   margin: 0;
-  padding: 0 10px 10px;
+  padding: 0 12px 12px;
   list-style: none;
   display: grid;
   gap: 7px;
@@ -125,9 +127,9 @@ summary::-webkit-details-marker {
 
 .major-list li {
   border: 1px solid var(--color-line);
-  border-radius: 8px;
+  border-radius: 9px;
   background: var(--color-surface-soft);
-  padding: 8px;
+  padding: 8px 9px;
 }
 
 .major-name {
@@ -142,5 +144,17 @@ summary::-webkit-details-marker {
   font-size: 0.76rem;
   color: var(--color-subtle);
   line-height: 1.5;
+}
+
+@media (max-width: 680px) {
+  summary {
+    display: grid;
+    gap: 3px;
+    align-items: start;
+  }
+
+  .meta {
+    text-align: left;
+  }
 }
 </style>

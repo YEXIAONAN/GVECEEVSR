@@ -1,31 +1,36 @@
 :root {
-  --color-bg: #f3f5f7;
-  --color-surface: #ffffff;
-  --color-surface-soft: #f8fafb;
-  --color-text: #1e2732;
-  --color-subtle: #5f6a77;
-  --color-line: #e0e5ea;
-  --color-line-strong: #d1d8e0;
-  --color-primary: #2b4f70;
-  --color-primary-press: #244563;
-  --color-primary-soft: #e9eff4;
+  --layout-max-width: 1240px;
+  --layout-side-gap: 16px;
 
-  --color-rush-bg: #fdf2e7;
-  --color-rush-text: #8a4b14;
-  --color-rush-line: #f0d7c1;
-  --color-steady-bg: #e9f2ee;
-  --color-steady-text: #2d5c45;
-  --color-steady-line: #cfe0d7;
-  --color-safe-bg: #edf3f9;
-  --color-safe-text: #335f86;
-  --color-safe-line: #d6e1ed;
-  --color-ref-bg: #f3f4f6;
-  --color-ref-text: #5a6470;
-  --color-ref-line: #dce1e6;
+  --color-bg: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f8fafc;
+  --color-text: #1f2937;
+  --color-subtle: #667085;
+  --color-subtle-strong: #475467;
+  --color-line: #dfe5ee;
+  --color-line-strong: #d8e0ea;
+  --color-primary: #234a6b;
+  --color-primary-press: #1d3d58;
+  --color-primary-soft: #edf2f7;
+  --color-accent: #4f6d8a;
+
+  --color-rush-bg: #f8f1e8;
+  --color-rush-text: #8b5632;
+  --color-rush-line: #dfc7b2;
+  --color-steady-bg: #eef3f8;
+  --color-steady-text: #3e5f7f;
+  --color-steady-line: #cfdbe7;
+  --color-safe-bg: #ebf2ee;
+  --color-safe-text: #3e5f50;
+  --color-safe-line: #cddcd2;
+  --color-ref-bg: #f2f4f7;
+  --color-ref-text: #596474;
+  --color-ref-line: #d7dee7;
 
   --radius-sm: 10px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
+  --radius-md: 14px;
+  --radius-lg: 18px;
 }
 
 *,
@@ -45,7 +50,7 @@ body {
   font-family: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
-  line-height: 1.55;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -63,13 +68,14 @@ a {
 
 .app-main {
   flex: 1;
-  width: min(100%, 760px);
+  width: min(100%, var(--layout-max-width));
   margin: 0 auto;
-  padding: 12px 12px 16px;
+  padding: 20px var(--layout-side-gap) 26px;
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 1023px) {
   .app-main {
-    padding: 16px 12px 22px;
+    padding-top: 14px;
+    padding-bottom: 20px;
   }
 }

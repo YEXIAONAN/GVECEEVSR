@@ -39,35 +39,31 @@ function sourceText(source) {
 <template>
   <article :class="['card', `card-${groupType}`]">
     <div class="head">
-      <div>
+      <div class="title-wrap">
         <h4>{{ item.school }}</h4>
-        <p>{{ item.major }}</p>
+        <p class="major">{{ item.major }}</p>
       </div>
       <span :class="['risk', `risk-${groupType}`]">{{ RISK_LABEL[groupType] || item.recommendType }}</span>
     </div>
 
-    <dl class="meta">
-      <div>
-        <dt>去年最低分</dt>
-        <dd>{{ formatScore(item.lastYearMinScore) }}</dd>
+    <div class="metric-row">
+      <div class="metric">
+        <p class="metric-label">去年最低分</p>
+        <p class="metric-value">{{ formatScore(item.lastYearMinScore) }}</p>
       </div>
-      <div>
-        <dt>当前分差</dt>
-        <dd>{{ formatGap(item.scoreGap) }}</dd>
+      <div class="metric">
+        <p class="metric-label">当前分差</p>
+        <p class="metric-value">{{ formatGap(item.scoreGap) }}</p>
       </div>
-      <div>
-        <dt>计划人数</dt>
-        <dd>{{ item.admissionPlan ?? '暂无公开数据' }}</dd>
+      <div class="metric">
+        <p class="metric-label">招生计划</p>
+        <p class="metric-value">{{ item.admissionPlan ?? '暂无公开数据' }}</p>
       </div>
-      <div>
-        <dt>风险等级</dt>
-        <dd>{{ RISK_LABEL[groupType] || '参考' }}</dd>
-      </div>
-    </dl>
+    </div>
 
     <p class="reason">{{ item.recommendReason }}</p>
     <p v-if="groupType === 'referenceOnly'" class="reference-hint">暂无公开最低分，仅可作计划参考。</p>
-    <p v-if="item.note" class="source">{{ item.note }}</p>
+    <p v-if="item.note" class="note">{{ item.note }}</p>
 
     <p class="source">最低分来源：{{ sourceText(item.scoreSource) }}</p>
     <p v-if="item.scoreSource?.url" class="source-link">
@@ -84,7 +80,7 @@ function sourceText(source) {
 .card {
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: 12px;
+  padding: 12px 12px 11px;
   background: #fff;
 }
 
@@ -99,12 +95,13 @@ h4 {
   margin: 0;
   font-size: 0.95rem;
   color: var(--color-text);
+  line-height: 1.35;
 }
 
-.head p {
+.major {
   margin: 4px 0 0;
-  font-size: 0.84rem;
-  color: var(--color-subtle);
+  font-size: 0.85rem;
+  color: var(--color-subtle-strong);
 }
 
 .risk {
@@ -120,38 +117,42 @@ h4 {
   background: var(--color-surface-soft);
 }
 
-.meta {
-  margin: 10px 0 0;
+.metric-row {
+  margin: 11px 0 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  grid-template-columns: 1fr;
+  gap: 7px;
 }
 
-.meta div {
+.metric {
   background: var(--color-surface-soft);
   border: 1px solid var(--color-line);
-  border-radius: 8px;
-  padding: 8px 9px;
+  border-radius: 9px;
+  padding: 8px 10px;
 }
 
-dt {
-  font-size: 0.73rem;
+.metric-label {
+  margin: 0;
+  font-size: 0.72rem;
   color: var(--color-subtle);
+  line-height: 1.2;
 }
 
-dd {
-  margin: 4px 0 0;
+.metric-value {
+  margin: 3px 0 0;
   font-size: 0.82rem;
   color: var(--color-text);
+  line-height: 1.4;
 }
 
 .reason,
+.note,
 .source,
 .reference-hint {
   margin: 9px 0 0;
-  font-size: 0.8rem;
+  font-size: 0.77rem;
   color: var(--color-subtle);
-  line-height: 1.58;
+  line-height: 1.52;
 }
 
 .reference-hint {
@@ -159,8 +160,8 @@ dd {
 }
 
 .source-link {
-  margin: 5px 0 0;
-  font-size: 0.78rem;
+  margin: 4px 0 0;
+  font-size: 0.76rem;
 }
 
 .source-link a {
@@ -205,5 +206,11 @@ dd {
   background: var(--color-ref-bg);
   border-color: var(--color-ref-line);
   color: var(--color-ref-text);
+}
+
+@media (min-width: 600px) {
+  .metric-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 </style>
