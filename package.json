@@ -1,10 +1,23 @@
 {
-  "name": "${PROJECT_NAME}",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "gx-zjgaokao-volunteer-simulator",
+  "version": "0.1.0",
+  "description": "广西职教高考志愿模拟推荐",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite --host",
+    "build": "vite build",
+    "build:check": "vite build",
+    "preview": "vite preview --host"
   },
-  "private": true
+  "private": true,
+  "author": "Waiting",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.3",
+    "vite": "^6.3.5"
+  }
 }

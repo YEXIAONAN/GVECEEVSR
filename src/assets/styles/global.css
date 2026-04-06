@@ -1,0 +1,43 @@
+:root {
+  --bg-main: #f3f5f7;
+  --surface-secondary: #f7f9fb;
+  --text-main: #1f2937;
+  --text-sub: #4b5563;
+  --border-color: #d8dee4;
+  --brand: #1f4f7a;
+  --brand-strong: #183f61;
+  --brand-soft: rgba(31, 79, 122, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  min-height: 100%;
+  font-family: 'PingFang SC', 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  color: var(--text-main);
+  background: var(--bg-main);
+}
+
+.page {
+  min-height: 100vh;
+  padding: 18px 12px 24px;
+}
+
+.container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 980px;
+  display: grid;
+  gap: 12px;
+}
+
+@media (min-width: 960px) {
+  .page {
+    padding-top: 24px;
+  }
+}
